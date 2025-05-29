@@ -1,1 +1,51 @@
-<h1>What am I doing???</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Run Python Online</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js
+"></script>
+</head>
+<body>
+  <h2>Run My Python Program</h2>
+
+  <textarea id="pycode" rows="10" cols="80">
+# Example Python program
+def greet(name):
+    return f"Hello, {name}!"
+
+greet("World")
+  </textarea><br><br>
+
+  <button onclick="runPython()">▶ Run</button>
+  <button onclick="copyOutput()">📋 Copy Output</button>
+
+  <h3>Output:</h3>
+  <textarea id="output" rows="5" cols="80" readonly></textarea>
+
+  <script>
+    let pyodide;
+    async function main() {
+      pyodide = await loadPyodide();
+    }
+    main();
+
+    async function runPython() {
+      const code = document.getElementById("pycode").value;
+      try {
+        const result = await pyodide.runPythonAsync(code);
+        document.getElementById("output").value = result;
+      } catch (err) {
+        document.getElementById("output").value = err;
+      }
+    }
+
+    function copyOutput() {
+      const out = document.getElementById("output");
+      out.select();
+      document.execCommand("copy");
+      alert("Output copied!");
+    }
+  </script>
+</body>
+</html>
