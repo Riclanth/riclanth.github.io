@@ -12,13 +12,16 @@
     #inputs div { margin-bottom: 8px; }
     button { margin-top: 15px; padding: 8px 15px; }
     #output { margin-top: 15px; white-space: pre-wrap; background: #f0f0f0; padding: 10px; }
+    #loading { color: #666; font-style: italic; }
   </style>
 </head>
 <body>
   <h1>Basic Civil Engineering Shape Calculator</h1>
   
+  <div id="loading">Loading Python runtime... Please wait.</div>
+  
   <label for="shapeSelect">Select Shape:</label>
-  <select id="shapeSelect">
+  <select id="shapeSelect" disabled>
     <option value="" selected disabled>-- Choose a Shape --</option>
     <optgroup label="2D Shapes">
       <option value="square">Square</option>
@@ -39,15 +42,29 @@
 
   <div id="inputs"></div>
 
-  <button onclick="calculate()">Calculate</button>
+  <button id="calculateBtn" disabled onclick="calculate()">Calculate</button>
 
   <h2>Results:</h2>
   <pre id="output"></pre>
 
   <script>
     let pyodide;
+    let isPyodideReady = false;
+    
     async function main() {
-      pyodide = await loadPyodide();
+      try {
+        pyodide = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/
+"
+        });
+        isPyodideReady = true;
+        document.getElementById('loading').textContent = "Python runtime ready!";
+        document.getElementById('shapeSelect').disabled = false;
+        document.getElementById('calculateBtn').disabled = false;
+      } catch (err) {
+        document.getElementById('loading').textContent = "Failed to load Python runtime: " + err.message;
+        console.error("Pyodide loading error:", err);
+      }
     }
     main();
 
@@ -83,6 +100,7 @@
         const input = document.createElement("input");
         input.type = "number";
         input.min = "0";
+        input.step = "any";
         input.id = inputName;
         input.placeholder = "Enter " + inputName.replace(/_/g, " ");
         label.appendChild(input);
@@ -93,6 +111,11 @@
     });
 
     async function calculate() {
+      if (!isPyodideReady) {
+        output.textContent = "Python runtime is not ready yet. Please wait...";
+        return;
+      }
+
       let shape = shapeSelect.value;
       if (!shape) {
         output.textContent = "Please select a shape.";
@@ -227,6 +250,7 @@ result_text
         output.textContent = result;
       } catch (err) {
         output.textContent = "Error in calculation: " + err;
+        console.error("Python execution error:", err);
       }
     }
   </script>
