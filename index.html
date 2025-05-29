@@ -1,27 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Run Python Online</title>
+  <meta charset="UTF-8" />
+  <title>Civil Eng Basic Shapes Calculator</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js
 "></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 10px; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100px; margin-left: 10px; }
+    #inputs div { margin-bottom: 8px; }
+    button { margin-top: 15px; padding: 8px 15px; }
+    #output { margin-top: 15px; white-space: pre-wrap; background: #f0f0f0; padding: 10px; }
+  </style>
 </head>
 <body>
-  <h2>Run My Python Program</h2>
+  <h1>Basic Civil Engineering Shape Calculator</h1>
+  
+  <label for="shapeSelect">Select Shape:</label>
+  <select id="shapeSelect">
+    <option value="" selected disabled>-- Choose a Shape --</option>
+    <optgroup label="2D Shapes">
+      <option value="square">Square</option>
+      <option value="rectangle">Rectangle</option>
+      <option value="circle">Circle</option>
+      <option value="triangle_equilateral">Triangle (Equilateral)</option>
+      <option value="triangle_right">Triangle (Right)</option>
+      <option value="triangle_isosceles">Triangle (Isosceles)</option>
+    </optgroup>
+    <optgroup label="3D Shapes">
+      <option value="cube">Cube</option>
+      <option value="rectangular_prism">Rectangular Prism</option>
+      <option value="cylinder">Cylinder</option>
+      <option value="sphere">Sphere</option>
+      <option value="cone">Cone</option>
+    </optgroup>
+  </select>
 
-  <textarea id="pycode" rows="10" cols="80">
-# Example Python program
-def greet(name):
-    return f"Hello, {name}!"
+  <div id="inputs"></div>
 
-greet("World")
-  </textarea><br><br>
+  <button onclick="calculate()">Calculate</button>
 
-  <button onclick="runPython()">▶ Run</button>
-  <button onclick="copyOutput()">📋 Copy Output</button>
-
-  <h3>Output:</h3>
-  <textarea id="output" rows="5" cols="80" readonly></textarea>
+  <h2>Results:</h2>
+  <pre id="output"></pre>
 
   <script>
     let pyodide;
@@ -30,21 +51,183 @@ greet("World")
     }
     main();
 
-    async function runPython() {
-      const code = document.getElementById("pycode").value;
-      try {
-        const result = await pyodide.runPythonAsync(code);
-        document.getElementById("output").value = result;
-      } catch (err) {
-        document.getElementById("output").value = err;
-      }
-    }
+    // Shape -> inputs mapping
+    const shapeInputs = {
+      square: ["side"],
+      rectangle: ["length", "width"],
+      circle: ["radius"],
+      triangle_equilateral: ["side"],
+      triangle_right: ["base", "height"],
+      triangle_isosceles: ["equal_side", "base"],
+      cube: ["side"],
+      rectangular_prism: ["length", "width", "height"],
+      cylinder: ["radius", "height"],
+      sphere: ["radius"],
+      cone: ["radius", "height"]
+    };
 
-    function copyOutput() {
-      const out = document.getElementById("output");
-      out.select();
-      document.execCommand("copy");
-      alert("Output copied!");
+    const inputsDiv = document.getElementById("inputs");
+    const shapeSelect = document.getElementById("shapeSelect");
+    const output = document.getElementById("output");
+
+    shapeSelect.addEventListener("change", () => {
+      output.textContent = "";
+      inputsDiv.innerHTML = "";
+
+      let shape = shapeSelect.value;
+      if (!shape) return;
+
+      for (const inputName of shapeInputs[shape]) {
+        const label = document.createElement("label");
+        label.textContent = inputName.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) + ":";
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.id = inputName;
+        input.placeholder = "Enter " + inputName.replace(/_/g, " ");
+        label.appendChild(input);
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(label);
+        inputsDiv.appendChild(wrapper);
+      }
+    });
+
+    async function calculate() {
+      let shape = shapeSelect.value;
+      if (!shape) {
+        output.textContent = "Please select a shape.";
+        return;
+      }
+
+      let params = {};
+      for (const inputName of shapeInputs[shape]) {
+        let val = parseFloat(document.getElementById(inputName).value);
+        if (isNaN(val) || val <= 0) {
+          output.textContent = Please enter a valid positive number for ${inputName}.;
+          return;
+        }
+        params[inputName] = val;
+      }
+
+      // Python code to calculate area, surface area, volume
+      let pyCode = `
+import math
+
+shape = "${shape}"
+params = ${JSON.stringify(params)}
+
+def format_num(x):
+    return round(x, 4)
+
+def square(side):
+    area = side * side
+    return area
+
+def rectangle(length, width):
+    area = length * width
+    return area
+
+def circle(radius):
+    area = math.pi * radius**2
+    return area
+
+def triangle_equilateral(side):
+    area = (math.sqrt(3) / 4) * side**2
+    return area
+
+def triangle_right(base, height):
+    area = 0.5 * base * height
+    return area
+
+def triangle_isosceles(equal_side, base):
+    height = (equal_side**2 - (base**2)/4)**0.5
+    area = 0.5 * base * height
+    return area
+
+def cube(side):
+    surface_area = 6 * side**2
+    volume = side**3
+    return surface_area, volume
+
+def rectangular_prism(length, width, height):
+    surface_area = 2*(length*width + width*height + height*length)
+    volume = length * width * height
+    return surface_area, volume
+
+def cylinder(radius, height):
+    surface_area = 2*math.pi*radius*(radius + height)
+    volume = math.pi * radius**2 * height
+    return surface_area, volume
+
+def sphere(radius):
+    surface_area = 4 * math.pi * radius**2
+    volume = (4/3) * math.pi * radius**3
+    return surface_area, volume
+
+def cone(radius, height):
+    slant_height = (radius**2 + height**2)**0.5
+    surface_area = math.pi * radius * (radius + slant_height)
+    volume = (1/3) * math.pi * radius**2 * height
+    return surface_area, volume
+
+result_text = ""
+
+if shape == "square":
+    area = square(params["side"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "rectangle":
+    area = rectangle(params["length"], params["width"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "circle":
+    area = circle(params["radius"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "triangle_equilateral":
+    area = triangle_equilateral(params["side"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "triangle_right":
+    area = triangle_right(params["base"], params["height"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "triangle_isosceles":
+    area = triangle_isosceles(params["equal_side"], params["base"])
+    result_text += f"Area: {format_num(area)}"
+
+elif shape == "cube":
+    surface_area, volume = cube(params["side"])
+    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
+
+elif shape == "rectangular_prism":
+    surface_area, volume = rectangular_prism(params["length"], params["width"], params["height"])
+    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
+
+elif shape == "cylinder":
+    surface_area, volume = cylinder(params["radius"], params["height"])
+    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
+
+elif shape == "sphere":
+    surface_area, volume = sphere(params["radius"])
+    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
+
+elif shape == "cone":
+    surface_area, volume = cone(params["radius"], params["height"])
+    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
+
+else:
+    result_text = "Shape calculation not implemented."
+
+result_text
+      `;
+
+      try {
+        let result = await pyodide.runPythonAsync(pyCode);
+        output.textContent = result;
+      } catch (err) {
+        output.textContent = "Error in calculation: " + err;
+      }
     }
   </script>
 </body>
