@@ -1,258 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Civil Eng Basic Shapes Calculator</title>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js
-"></script>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 10px; }
-    label { display: block; margin-top: 10px; }
-    input { width: 100px; margin-left: 10px; }
-    #inputs div { margin-bottom: 8px; }
-    button { margin-top: 15px; padding: 8px 15px; }
-    #output { margin-top: 15px; white-space: pre-wrap; background: #f0f0f0; padding: 10px; }
-    #loading { color: #666; font-style: italic; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civil Engineering Study Hub</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+        
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .about-text p {
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .features {
+            background-color: var(--light-color);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .portfolio {
+            text-align: center;
+        }
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .portfolio-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .portfolio-img {
+            height: 200px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+        }
+        
+        .portfolio-info {
+            padding: 20px;
+        }
+        
+        .faq {
+            background-color: var(--light-color);
+        }
+        
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .faq-item h3 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .contact-card {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .contact-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            section {
+                padding: 40px 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Basic Civil Engineering Shape Calculator</h1>
-  
-  <div id="loading">Loading Python runtime... Please wait.</div>
-  
-  <label for="shapeSelect">Select Shape:</label>
-  <select id="shapeSelect" disabled>
-    <option value="" selected disabled>-- Choose a Shape --</option>
-    <optgroup label="2D Shapes">
-      <option value="square">Square</option>
-      <option value="rectangle">Rectangle</option>
-      <option value="circle">Circle</option>
-      <option value="triangle_equilateral">Triangle (Equilateral)</option>
-      <option value="triangle_right">Triangle (Right)</option>
-      <option value="triangle_isosceles">Triangle (Isosceles)</option>
-    </optgroup>
-    <optgroup label="3D Shapes">
-      <option value="cube">Cube</option>
-      <option value="rectangular_prism">Rectangular Prism</option>
-      <option value="cylinder">Cylinder</option>
-      <option value="sphere">Sphere</option>
-      <option value="cone">Cone</option>
-    </optgroup>
-  </select>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Civil Engineering Study Hub</div>
+                <div class="tagline">Empowering future engineers with comprehensive, practical, and cutting-edge civil engineering study resources.</div>
+            </div>
+        </div>
+    </header>
 
-  <div id="inputs"></div>
+    <section class="about">
+        <div class="container">
+            <h2 class="section-title">About Civil Engineering Study Hub</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>As passionate civil engineer students, we created Civil Engineering Study Hub or CESH to provide comprehensive materials that will help aspiring engineers excel in their academic and professional journeys, making complex concepts simple and accessible.</p>
+                    <p>The path to become an engineer is not an easy one, therefore, we hope that this site will pave the road to our fellow aspirants, or to those interested.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <button id="calculateBtn" disabled onclick="calculate()">Calculate</button>
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">OUR RESOURCES</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Formulas</h3>
+                    <p>This link features formulas commonly used in civil engineering. Chapter 1 consists of differential calculus formulas, while Chapter 2 contains integral calculus formulas.</p>
+                    <p><a href="https://drive.google.com/drive/folders/19PvZhSV2Yn9oTcTZhP5RoeJuRMVFHf0x?usp=sharing
+" class="btn" target="_blank">Access Formulas</a></p>
+                </div>
+                <div class="feature-card">
+                    <h3>Placeholder</h3>
+                    <p>Content coming soon. Check back later for more resources.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Placeholder</h3>
+                    <p>Content coming soon. Check back later for more resources.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <h2>Results:</h2>
-  <pre id="output"></pre>
+    <section class="portfolio">
+        <div class="container">
+            <h2 class="section-title">Our Resources</h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-img">Placeholder</div>
+                    <div class="portfolio-info">
+                        <h3>Portfolio item 1</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-img">Placeholder</div>
+                    <div class="portfolio-info">
+                        <h3>Portfolio item 2</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-img">Placeholder</div>
+                    <div class="portfolio-info">
+                        <h3>Portfolio item 3</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-img">Placeholder</div>
+                    <div class="portfolio-info">
+                        <h3>Portfolio item 4</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <script>
-    let pyodide;
-    let isPyodideReady = false;
-    
-    async function main() {
-      try {
-        pyodide = await loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/
-"
-        });
-        isPyodideReady = true;
-        document.getElementById('loading').textContent = "Python runtime ready!";
-        document.getElementById('shapeSelect').disabled = false;
-        document.getElementById('calculateBtn').disabled = false;
-      } catch (err) {
-        document.getElementById('loading').textContent = "Failed to load Python runtime: " + err.message;
-        console.error("Pyodide loading error:", err);
-      }
-    }
-    main();
+    <section class="faq">
+        <div class="container">
+            <h2 class="section-title">FAQs</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <h3>What are your business hours?</h3>
+                    <p>Monday - Sunday: 12am-11:59pm<br>We're available 24/7!</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How can I contact you?</h3>
+                    <p>You can contact us at the provided email below.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What types of services do you offer?</h3>
+                    <p>We provide study resources for civil engineering students.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How do I use CESH?</h3>
+                    <p>Browse our resources and download materials as needed.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Do we own the materials?</h3>
+                    <p>*Note: Only the notes labeled with EVSU-OCC or Eastern Visayas State University, Ormoc City Campus are our property. Anything else were borrowed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // Shape -> inputs mapping
-    const shapeInputs = {
-      square: ["side"],
-      rectangle: ["length", "width"],
-      circle: ["radius"],
-      triangle_equilateral: ["side"],
-      triangle_right: ["base", "height"],
-      triangle_isosceles: ["equal_side", "base"],
-      cube: ["side"],
-      rectangular_prism: ["length", "width", "height"],
-      cylinder: ["radius", "height"],
-      sphere: ["radius"],
-      cone: ["radius", "height"]
-    };
+    <section class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info">
+                <div class="contact-card">
+                    <h3>Hours</h3>
+                    <p>Monday - Sunday: 12am-11:59pm</p>
+                    <p>Weekend: Closed</p>
+                </div>
+                <div class="contact-card">
+                    <h3>Follow Us</h3>
+                    <p>Aranas, Fatima Columba C.</p>
+                    <a href="https://www.facebook.com/share/16mgQLG9Nr/" target="_blank" class="btn">GET IN TOUCH</a>
+                </div>
+                <div class="contact-card">
+                    <h3>Contact</h3>
+                    <p>fattyburger430@gmail.com</p>
+                    <a href="mailto:fattyburger430@gmail.com" class="btn">GET IN TOUCH</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    const inputsDiv = document.getElementById("inputs");
-    const shapeSelect = document.getElementById("shapeSelect");
-    const output = document.getElementById("output");
-
-    shapeSelect.addEventListener("change", () => {
-      output.textContent = "";
-      inputsDiv.innerHTML = "";
-
-      let shape = shapeSelect.value;
-      if (!shape) return;
-
-      for (const inputName of shapeInputs[shape]) {
-        const label = document.createElement("label");
-        label.textContent = inputName.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) + ":";
-        const input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.step = "any";
-        input.id = inputName;
-        input.placeholder = "Enter " + inputName.replace(/_/g, " ");
-        label.appendChild(input);
-        const wrapper = document.createElement("div");
-        wrapper.appendChild(label);
-        inputsDiv.appendChild(wrapper);
-      }
-    });
-
-    async function calculate() {
-      if (!isPyodideReady) {
-        output.textContent = "Python runtime is not ready yet. Please wait...";
-        return;
-      }
-
-      let shape = shapeSelect.value;
-      if (!shape) {
-        output.textContent = "Please select a shape.";
-        return;
-      }
-
-      let params = {};
-      for (const inputName of shapeInputs[shape]) {
-        let val = parseFloat(document.getElementById(inputName).value);
-        if (isNaN(val) || val <= 0) {
-          output.textContent = Please enter a valid positive number for ${inputName}.;
-          return;
-        }
-        params[inputName] = val;
-      }
-
-      // Python code to calculate area, surface area, volume
-      let pyCode = `
-import math
-
-shape = "${shape}"
-params = ${JSON.stringify(params)}
-
-def format_num(x):
-    return round(x, 4)
-
-def square(side):
-    area = side * side
-    return area
-
-def rectangle(length, width):
-    area = length * width
-    return area
-
-def circle(radius):
-    area = math.pi * radius**2
-    return area
-
-def triangle_equilateral(side):
-    area = (math.sqrt(3) / 4) * side**2
-    return area
-
-def triangle_right(base, height):
-    area = 0.5 * base * height
-    return area
-
-def triangle_isosceles(equal_side, base):
-    height = (equal_side**2 - (base**2)/4)**0.5
-    area = 0.5 * base * height
-    return area
-
-def cube(side):
-    surface_area = 6 * side**2
-    volume = side**3
-    return surface_area, volume
-
-def rectangular_prism(length, width, height):
-    surface_area = 2*(length*width + width*height + height*length)
-    volume = length * width * height
-    return surface_area, volume
-
-def cylinder(radius, height):
-    surface_area = 2*math.pi*radius*(radius + height)
-    volume = math.pi * radius**2 * height
-    return surface_area, volume
-
-def sphere(radius):
-    surface_area = 4 * math.pi * radius**2
-    volume = (4/3) * math.pi * radius**3
-    return surface_area, volume
-
-def cone(radius, height):
-    slant_height = (radius**2 + height**2)**0.5
-    surface_area = math.pi * radius * (radius + slant_height)
-    volume = (1/3) * math.pi * radius**2 * height
-    return surface_area, volume
-
-result_text = ""
-
-if shape == "square":
-    area = square(params["side"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "rectangle":
-    area = rectangle(params["length"], params["width"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "circle":
-    area = circle(params["radius"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "triangle_equilateral":
-    area = triangle_equilateral(params["side"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "triangle_right":
-    area = triangle_right(params["base"], params["height"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "triangle_isosceles":
-    area = triangle_isosceles(params["equal_side"], params["base"])
-    result_text += f"Area: {format_num(area)}"
-
-elif shape == "cube":
-    surface_area, volume = cube(params["side"])
-    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
-
-elif shape == "rectangular_prism":
-    surface_area, volume = rectangular_prism(params["length"], params["width"], params["height"])
-    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
-
-elif shape == "cylinder":
-    surface_area, volume = cylinder(params["radius"], params["height"])
-    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
-
-elif shape == "sphere":
-    surface_area, volume = sphere(params["radius"])
-    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
-
-elif shape == "cone":
-    surface_area, volume = cone(params["radius"], params["height"])
-    result_text += f"Surface Area: {format_num(surface_area)}\\nVolume: {format_num(volume)}"
-
-else:
-    result_text = "Shape calculation not implemented."
-
-result_text
-      `;
-
-      try {
-        let result = await pyodide.runPythonAsync(pyCode);
-        output.textContent = result;
-      } catch (err) {
-        output.textContent = "Error in calculation: " + err;
-        console.error("Python execution error:", err);
-      }
-    }
-  </script>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Civil Engineering Study Hub</div>
+                <div class="social-links">
+                    <!-- Add social media icons here -->
+                </div>
+                <div class="copyright">© 2025 Civil Engineering Study Hub.</div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
